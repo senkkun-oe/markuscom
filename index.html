@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Markus' Online Playground</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <style>
+            :root {
+                --primcol: white;
+                --textcol: black;
+            }
+            body {
+                background-color: var(--primcol);
+                color: var(--textcol);
+                position: relative;
+            }
+            .acccaution {
+                accent-color: red;
+            }
+
+            button:not(.norm) {
+                padding: 10px 30px;
+            }
+            button.mv {
+                background-color: violet;
+            }
+            div.vfxmenu button {
+                background-color: blue;
+                color: white;
+            }
+            input.mv {
+                background-color: violet;
+                accent-color: #ee82ee;
+            }
+            .dark {
+                color: white;
+            }
+            input {
+                background-color: var(--primcol);
+                color: var(--textcol);
+            }
+
+            details > :not(summary) :not(button) {
+                margin-left: 20px;
+            }
+
+            #fx-layer {
+                position: absolute;
+                top: 0;
+                left: 0;
+                pointer-events: none;
+                z-index: 5;
+            }
+
+            #main {
+                position: relative;
+                z-index: 1;
+            }
+
+            #fxcv {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 855px;
+                pointer-events: none;
+                z-index: 99;
+            }
+        </style>
+    </head>
+    <body>
+        <canvas id="fxcv"></canvas>
+        <details class="lkls">
+            <summary>Links</summary>
+            <hr>
+            <button id="adlk" class="norm">+</button>
+            <button id="adfx" class="norm">+FX</button>
+        </details>
+        <iframe id="main" width="100%" height="855" src="https://www.youtube.com/embed/dXLv7gRmM-A" frameborder="0"></iframe>
+        <div class="vidmenu"></div>
+        <div class="vfxmenu"></div>
+        <script>
+            function appendChildList(parent, childlist) {
+                for (const child of childlist) {
+                    parent.appendChild(child);
+                }
+            }
+
+            function br() {
+                return document.createElement('br');
+            }
+            const embd = 'https://youtube.com/embed/'
+
+            // VFX ///////////////////////////////////////////////////////////////////////
+            const canvas = document.getElementById('fxcv');
+            const ctx = canvas.getContext('2d');
+
+            canvas.width = window.innerWidth;
+            canvas.height = 855;
+            let particles = [];
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                particles.forEach((p, index) => {
+                    if (p.effect === 'spns') {
+                        p.x -= p.speed; 
+                    } else {
+                        p.y += p.speed;
+                    }
+                    if (p.image) {
+                        let displayWidth = p.size;
+                        let scale = displayWidth / p.image.width;
+                        let displayHeight = p.image.height * scale;
+                        ctx.drawImage(p.image, p.x, p.y, displayWidth, displayHeight); 
+                    }
+                    if (p.y > canvas.height || p.x < -displayWidth) {
+                        particles.splice(index, 1);
+                    }
+                });
+                requestAnimationFrame(animate);
+            }
+            animate();
+
+            // END OF VFX ///////////////////////////////////////////////////////////////////////
+
+            function templ_n(vid, ismv, btnm) {
+                const trgt = document.querySelector('.lkls');
+                const tgt2 = document.querySelector('.vidmenu');
+                if (!trgt) {
+                    console.error("Target container '.lkls' not found!");
+                    return;
+                }
+                let ndiv = document.createElement('div');
+                let urlp = document.createElement('input');
+                urlp.type = 'text';
+                urlp.placeholder = 'Enter YouTube Video ID...';
+                urlp.value = vid;
+                let mvbx = document.createElement('input');
+                mvbx.type = 'checkbox';
+                mvbx.checked = ismv;
+                mvbx.classList.add('mv');
+                const uniqueId = 'ismv-' + Date.now(); 
+                mvbx.id = uniqueId;
+                let mblb = document.createElement('label');
+                mblb.textContent = 'Is a Music Video (MV)';
+                mblb.htmlFor = uniqueId;
+                let bnnm = document.createElement('input');
+                bnnm.placeholder = 'Button name here...';
+                bnnm.value = btnm;
+                let dlte = document.createElement('input');
+                dlte.type = 'range';
+                dlte.value = '0';
+                dlte.style.width = '50px';
+                dlte.classList.add('acccaution');
+                let bton = document.createElement('button');
+                bton.textContent = btnm;
+                if (ismv) {
+                    urlp.classList.add('mv');
+                    urlp.classList.add('dark');
+                    bton.classList.add('mv');
+                    bton.classList.add('dark');
+                } else {
+                    urlp.classList.remove('mv');
+                    urlp.classList.remove('dark');
+                    bton.classList.remove('mv');
+                    bton.classList.remove('dark');
+                }
+                appendChildList(ndiv, [urlp, mvbx, mblb, br(), bnnm, dlte, br()]);
+                trgt.appendChild(ndiv);
+                
+                tgt2.appendChild(bton);
+
+                mvbx.addEventListener('input', () => {
+                    mvch = mvbx.checked;
+                    if (mvch) {
+                        urlp.classList.add('mv');
+                        urlp.classList.add('dark');
+                        bton.classList.add('mv');
+                        bton.classList.add('dark');
+                    } else {
+                        urlp.classList.remove('mv');
+                        urlp.classList.remove('dark');
+                        bton.classList.remove('mv');
+                        bton.classList.remove('dark');
+                    }
+                });
+
+                bnnm.addEventListener('input', () => {
+                    bton.textContent = bnnm.value;
+                });
+
+                bton.addEventListener('click', () => {
+                    const ifrm = document.getElementById('main')
+                    ifrm.src = embd + urlp.value;
+                    console.log('Tried to fire URL: ' + embd + urlp.value)
+                    console.log('Fired ' + ifrm.src)
+                });
+
+                dlte.addEventListener('change', () => {
+                    if (dlte.value == 100) {
+                        tgt2.removeChild(bton);
+                        trgt.removeChild(ndiv);
+                    }
+                });
+            }
+
+            function templ_x() {
+                const trgt = document.querySelector('.lkls');
+                const tgt2 = document.querySelector('.vfxmenu');
+                if (!trgt) {
+                    console.error("Target container '.lkls' not found!");
+                    return;
+                }
+                let ndiv = document.createElement('div');
+                let urlp = document.createElement('input');
+                urlp.type = 'file';
+                urlp.accept = 'image/*';
+                urlp.placeholder = 'Choose Image...';
+                let fxtp = document.createElement('select');
+                const uniqueId = 'fxtype-' + Date.now(); 
+                fxtp.id = uniqueId;
+                let xtbl = document.createElement('label');
+                xtbl.textContent = 'Type of effect';
+                xtbl.htmlFor = uniqueId
+                let fall = document.createElement('option');
+                fall.value = 'fall';
+                fall.textContent = 'Falling';
+                let spns = document.createElement('option');
+                spns.value = 'spns';
+                spns.textContent = 'Spans';
+                appendChildList(fxtp, [fall, spns]);
+                let bnnm = document.createElement('input');
+                bnnm.placeholder = 'Button name here...';
+                let dlte = document.createElement('input');
+                dlte.type = 'range'
+                dlte.value = '0'
+                dlte.style.width = '50px';
+                dlte.classList.add('acccaution');
+                appendChildList(ndiv, [urlp, xtbl, fxtp, bnnm, dlte, br()]);
+                trgt.appendChild(ndiv);
+                let bton = document.createElement('button');
+                tgt2.appendChild(bton);
+
+                let slmg = null;
+
+                urlp.addEventListener('change', (e) => {
+                    const file = e.target.files[0];
+                    if (file) {
+                        const rdr1 = new FileReader(); 
+                        rdr1.onload = (event) => {
+                            const img = new Image();
+                            img.src = event.target.result;
+                            slmg = img;
+                        };
+                        rdr1.readAsDataURL(file);
+                    }
+                });
+
+                bnnm.addEventListener('input', () => {
+                    bton.textContent = bnnm.value;
+                });
+
+                bton.addEventListener('click', () => {
+                    const scfx = fxtp.value; 
+
+                    for(let i = 0; i < 10; i++) {
+                        particles.push({
+                            x: scfx === 'spns' ? canvas.width + 50 : Math.random() * canvas.width,
+                            y: scfx === 'spns' ? Math.random() * canvas.height : -20,
+                            speed: 2 + Math.random() * 5,
+                            image: slmg,
+                            size: 30 + Math.random() * 100,
+                            effect: scfx
+                        });
+                    }
+                });
+
+                dlte.addEventListener('change', () => {
+                    if (dlte.value == 100) {
+                        tgt2.removeChild(bton);
+                        trgt.removeChild(ndiv);
+                    }
+                });
+            }
+
+            // Templates
+            templ_n('RvoTmYhBRJE', false, 'Chicken Crow');
+            templ_n('upA0UM43s-M', false, 'Horses');
+            templ_n('mGgDKEVZXw8', true, 'Banana Phone');
+            templ_n('3PLJ_XwgNNQ', false, 'Random Animals');
+            templ_n('Aw6GkiCvcWs', false, 'Elephants (Nat Geo)');
+            templ_n('PuVyEDIA4-4', true, 'Bouncing Balls');
+            templ_n('6_i1-Tkq-Qg', true, 'Blowin\' In The Wind')
+
+            const adlk = document.getElementById('adlk');
+            const adfx = document.getElementById('adfx');
+            adlk.addEventListener('click', (e) => {
+                templ_n('', false, '');
+                console.log('Template loaded.');
+            });
+            adfx.addEventListener('click', (e) => {
+                templ_x();
+                console.log('Template2 loaded.');
+            });
+        </script>
+    </body>
+</html>
