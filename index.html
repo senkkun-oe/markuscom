@@ -102,17 +102,20 @@
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
                 particles.forEach((p, index) => {
                     if (p.effect === 'spns') {
-                        p.x -= p.speed; 
+                        p.x -= p.speed;
                     } else {
                         p.y += p.speed;
                     }
-                    if (p.image) {
+                    if (p.image && p.image.complete && p.image.width > 0) {
                         let displayWidth = p.size;
                         let scale = displayWidth / p.image.width;
                         let displayHeight = p.image.height * scale;
                         ctx.drawImage(p.image, p.x, p.y, displayWidth, displayHeight); 
+                    } else if (!p.image) {
+                        ctx.fillStyle = 'yellow';
+                        ctx.fillRect(p.x, p.y, 20, 20);
                     }
-                    if (p.y > canvas.height || p.x < -displayWidth) {
+                    if (p.y > canvas.height || p.x < -200) {
                         particles.splice(index, 1);
                     }
                 });
@@ -260,16 +263,17 @@
                 });
 
                 bton.addEventListener('click', () => {
-                    const scfx = fxtp.value; 
+                    const slfx = fxtp.value; 
+                    const cont = slfx === 'spns' ? 1 : 10; 
 
-                    for(let i = 0; i < 10; i++) {
+                    for(let i = 0; i < cont; i++) {
                         particles.push({
-                            x: scfx === 'spns' ? canvas.width + 50 : Math.random() * canvas.width,
-                            y: scfx === 'spns' ? Math.random() * canvas.height : -20,
+                            x: slfx === 'spns' ? canvas.width + 100 : Math.random() * canvas.width,
+                            y: slfx === 'spns' ? canvas.height - 120 : -20, 
                             speed: 2 + Math.random() * 5,
                             image: slmg,
-                            size: 30 + Math.random() * 100,
-                            effect: scfx
+                            size: slfx === 'spns' ? 150 : 30 + Math.random() * 100,
+                            effect: slfx
                         });
                     }
                 });
