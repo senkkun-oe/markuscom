@@ -52,9 +52,21 @@
                 z-index: 5;
             }
 
-            #main {
+            #wrap {
+                width: 100%;
+                height: 80vh; 
+                overflow: hidden; /* This hides the parts of the video that "spill over" */
                 position: relative;
-                z-index: 1;
+                background: black;
+            }
+
+            #main {
+                width: 100%;
+                height: 80vh%;
+                position: absolute;
+                /* This is the magic: it tells the video how to move inside the wrap */
+                transform-origin: center center; 
+                transition: transform 0.1s ease-out;
             }
 
             #fxcv {
@@ -62,7 +74,7 @@
                 top: 0;
                 left: 0;
                 width: 100%;
-                height: 855px;
+                height: 80vh; 
                 pointer-events: none;
                 z-index: 99;
             }
@@ -76,9 +88,20 @@
             <button id="adlk" class="norm">+</button>
             <button id="adfx" class="norm">+FX</button>
         </details>
-        <iframe id="main" width="100%" height="855" src="https://www.youtube.com/embed/dXLv7gRmM-A" frameborder="0"></iframe>
+        <div style="padding: 10px;">
+            <label style="color: gray; font-size: 12px;">Zoom:</label>
+            <input type="range" id="szer" min="100" max="200" value="100">
+            <label style="color: gray; font-size: 12px;">X</label>
+            <input type="range" id="panx" min="-50" max="50" value="0">
+            <label style="color: gray; font-size: 12px;">Y</label>
+            <input type="range" id="pany" min="-50" max="50" value="0">
+        </div>
+        <div id="mask" style="width: 100%; height: 80vh; overflow: hidden; position: relative;">
+            <iframe id="main" src="..." style="width: 100%; height: 100%; position: absolute;"></iframe>
+        </div>
         <div class="vidmenu"></div>
         <div class="vfxmenu"></div>
+        <p>V 1.0 Gamma</p>
         <script>
             function appendChildList(parent, childlist) {
                 for (const child of childlist) {
@@ -144,7 +167,7 @@
                 const uniqueId = 'ismv-' + Date.now(); 
                 mvbx.id = uniqueId;
                 let mblb = document.createElement('label');
-                mblb.textContent = 'Is a Music Video (MV)';
+                mblb.textContent = 'Is a Music Video';
                 mblb.htmlFor = uniqueId;
                 let bnnm = document.createElement('input');
                 bnnm.placeholder = 'Button name here...';
@@ -305,6 +328,24 @@
                 templ_x();
                 console.log('Template2 loaded.');
             });
+
+            const szer = document.getElementById('szer'); 
+            const panx = document.getElementById('panx'); 
+            const pany = document.getElementById('pany'); 
+            const main = document.getElementById('main'); 
+            function updt() {
+                const z = szer.value / 100; // Zoom factor
+                const x = panx.value;       // Horizontal pan
+                const y = pany.value;       // Vertical pan
+
+                // Move and scale the video, but the #wrap container never moves!
+                main.style.transform = `scale(${z}) translate(${x}%, ${y}%)`;
+            }
+
+            // Add the listeners to your sliders
+            szer.addEventListener('input', updt);
+            panx.addEventListener('input', updt);
+            pany.addEventListener('input', updt);
         </script>
     </body>
 </html>
